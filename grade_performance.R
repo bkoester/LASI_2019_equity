@@ -1,12 +1,17 @@
-grade_performance <- function(sr,sc)
+grade_performance <- function(sr,sc,SBJCT='Physics, General',CATNUM=167)
 {
-  #physics 138
-  #physics 276
-  hh <- sc %>% filter(SBJCT_CD == 'Physics, General' & CATLG_NBR == 138) %>% 
+  library(tidyverse)
+  sr <- read_tsv('~/Google Drive/code/SEISMIC/LASI19code/LASI_2019_equity/student_record.tab')
+  sc <- read_tsv('~/Google Drive/code/SEISMIC/LASI19code/LASI_2019_equity/student_course.tab')
+  
+  #physics 167
+  #physics 2205
+  hh <- sc %>% filter(SBJCT_CD == SBJCT & CATLG_NBR == CATNUM) %>% 
         select(STDNT_ID,GRD_PNTS_PER_UNIT_NBR,EXCL_CLASS_CUM_GPA,TERM_CD) %>% left_join(sr)
   
   kk <- lasso_rank(hh,indep=c('MAX_ACT_MATH_SCR','HS_GPA','STDNT_UNDREP_MNRTY_CD',
-                              'FIRST_GENERATION','EXCL_CLASS_CUM_GPA','STDNT_GNDR_SHORT_DES'))
+                              'FIRST_GENERATION','EXCL_CLASS_CUM_GPA','STDNT_GNDR_SHORT_DES',
+                              'MEDIAN_INCOME'))
   View(hh)
   
   gpd <- hh %>% mutate(GPEN=GRD_PNTS_PER_UNIT_NBR-EXCL_CLASS_CUM_GPA) %>% 
