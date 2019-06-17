@@ -28,6 +28,9 @@ a key to the set-up the pseudo-experiment that will be conducted via propensity-
 - `census_api_example.R`: A wrapper for the `censusapi` library.
 
 ### Data
+Transcript level and student information system data are generally not publically-available for many good reasons. But it
+is also a limitation when it comes to developing shared methods and drawing in many people to explore the possibilities of ressearch with SIS data. Using the statistical relationships among students, courses, and their characteristics we can construct synthetic student data sets that look very much like the real thing. Many - but not ALL - relationships observed in the real data are recovered in the synthetic data. Previously unknown relationships may also be discovered in the synthetic data, and may prompt a researcher to turn around and ask if that discovery is simply an artifact of the synthetic data, or if it exists in their own real data as well.
+
 - `student_course.tab`: A synthetic data set of student courses and course grades, as they might exist in a real SIS,
 that are central to this project. Diversity, equity, and inclusion will be considered in these contexts.
 - `student_record.tab`: A synthetic data set of student background/demography data that serves as basic controls for
