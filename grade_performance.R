@@ -1,11 +1,12 @@
-grade_performance <- function(sr,sc,SBJCT='Physics, General',CATNUM=167,SBJCT2='NONE',CATNUM2='NONE')
+grade_performance <- function(sr,sc,SBJCT='PHYSICS',CATNUM=140,SBJCT2='NONE',CATNUM2='NONE')
 {
   library(tidyverse)
   sr <- read_tsv('~/Google Drive/code/SEISMIC/LASI19code/LASI_2019_equity/student_record.tab')
   sc <- read_tsv('~/Google Drive/code/SEISMIC/LASI19code/LASI_2019_equity/student_course.tab')
   
-  #physics 167
-  #physics 205
+  #physics 140
+  #physics 240
+  
   hh <- sc %>% filter(SBJCT_CD == SBJCT & CATLG_NBR == CATNUM) %>% 
         select(STDNT_ID,GRD_PNTS_PER_UNIT_NBR,EXCL_CLASS_CUM_GPA,TERM_CD) %>% left_join(sr)
   
@@ -14,11 +15,11 @@ grade_performance <- function(sr,sc,SBJCT='Physics, General',CATNUM=167,SBJCT2='
   
   if (SBJCT2 != 'NONE')
   {
-    
-    
+    tt <- sequence_inclusion(hh,sc,SBJCT=SBJCT2,CATNUM=CATNUM2)
+    print(tt)
   }
   
-  return(hh)
+  return(tt)
 }
 
 course_diversity <- function(hh,sr,q=2)
@@ -50,22 +51,26 @@ course_equity <- function(hh)
   gpd <- hh %>% mutate(GPEN=GRD_PNTS_PER_UNIT_NBR-EXCL_CLASS_CUM_GPA) %>% 
     group_by(STDNT_GNDR_SHORT_DES) %>%
     summarize(GPD=mean(GPEN,na.rm=TRUE),se=sd(GPEN,na.rm=TRUE)/sqrt(n()))
+  print('course equity')
+  print(gpd)
   
-  pp <- pp_match(as.data.frame(hh))
-  
-  
+  #pp <- pp_match(as.data.frame(hh))
   
 }
 
 sequence_inclusion <- function(hh,sc,SBJCT2,CATNUM2)
 {
-  hh2 <- sc %>% filter(SBJCT_CD == SBJCT2 & CATLG_NBR == CATNUM2) %>% 
-    select(STDNT_ID,TERM_CD)
-  hh  <- hh %>% left_join(hh2,by='STDNT_ID') %>% 
-         filter(is.na(TERM_CD.y) | (TERM_CD.y > TERM_CD.x))
   
+  #the next course
+  hh2 <- sc %>% filter(SBJCT_CD == SBJCT2 & CATLG_NBR == CATNUM2) %>% select(STDNT_ID,TERM_CD)
+  
+  #now match the two
+  hh  <- hh %>% left_join(hh2,by='STDNT_ID') %>% mutate(CONTINUE=1)
+  
+  hh$CONTINUE[which(is.na(hh$TERM_CD.y))] <- 0
   
   return(hh)
+  
 }
 
 pp_match <- function(hh)
