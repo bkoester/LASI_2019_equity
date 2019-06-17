@@ -69,7 +69,10 @@ sequence_inclusion <- function(hh,sc,SBJCT2,CATNUM2)
   
   hh$CONTINUE[which(is.na(hh$TERM_CD.y))] <- 0
   
-  return(hh)
+  ll %>% mutate(N=n()) %>% group_by(GRD_PNTS_PER_UNIT_NBR) %>% 
+         summarize(nex=sum(CONTINUE)/n(),sqrt(nex*(1-nex)/n()))
+  
+  return(ll)
   
 }
 
