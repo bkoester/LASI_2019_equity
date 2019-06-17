@@ -26,6 +26,7 @@ in the next course (when a sequence is specified).
 a key to the set-up the pseudo-experiment that will be conducted via propensity-score matching and the `optmatch` library.
 
 - `census_api_example.R`: A wrapper for the `censusapi` library.
+- `larc.matched.outcomes.R`: A wrapper for the `optmatch` set of propensity score matching functions.
 
 ### Data
 Transcript level and student information system data are generally not publically-available for many good reasons. But it
