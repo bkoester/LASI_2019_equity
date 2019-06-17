@@ -14,9 +14,7 @@ grade_performance <- function(sr,sc,SBJCT='Physics, General',CATNUM=167,SBJCT2='
   
   if (SBJCT2 != 'NONE')
   {
-    hh2 <- sc %>% filter(SBJCT_CD == SBJCT2 & CATLG_NBR == CATNUM2) %>% 
-      select(STDNT_ID,TERM_CD)
-    hh  <- hh %>% left_join(hh2,by='STDNT_ID')
+    
     
   }
   
@@ -56,6 +54,18 @@ course_equity <- function(hh)
   pp <- pp_match(as.data.frame(hh))
   
   
+  
+}
+
+sequence_inclusion <- function(hh,sc,SBJCT2,CATNUM2)
+{
+  hh2 <- sc %>% filter(SBJCT_CD == SBJCT2 & CATLG_NBR == CATNUM2) %>% 
+    select(STDNT_ID,TERM_CD)
+  hh  <- hh %>% left_join(hh2,by='STDNT_ID') %>% 
+         filter(is.na(TERM_CD.y) | (TERM_CD.y > TERM_CD.x))
+  
+  
+  return(hh)
 }
 
 pp_match <- function(hh)
@@ -71,10 +81,58 @@ pp_match <- function(hh)
   
 }
 
+grade_anonmaly_plot <- function(hh)
+{
+  hh <- hh %>% mutate(GENDER=as.character(STDNT_GNDR_SHORT_DES),
+                      FG=as.character(FIRST_GENERATION),
+                      URM=as.character(STDNT_UNDREP_MNRTY_CD)) %>%
+    select(c(MAX_ACT_MATH_SCR,MAX_ACT_ENGL_SCR,HS_GPA,GRD_PNTS_PER_UNIT_NBR,
+             URM,GENDER,FG,FIRST_GENERATION,STDNT_UNDREP_MNRTY_CD,EXCL_CLASS_CUM_GPA))
+  
+  bin  <- cut_width(data$EXCL_CLASS_CUM_GPA,0.33)
+  bin  <- as.numeric( sub("[^,]*,([^]]*)\\]", "\\1", bin))-0.33
+  data <- add_column(data,bin)
+  
+}
+
 
 useful_checks <- function(sr,sc)
 {
   aa <- sc %>% group_by(SBJCT_CD,CATLG_NBR) %>% tally()
   View(aa)
   
+}
+
+gpao.binned.gndr <- function(scRES)
+{
+  #scRES %>% group_by(STDNT_GNDR_SHORT_DES) %>% summarsize(meanGRD)
+  tt <- scRES %>% group_by(GENDER,bin) %>% 
+    summarise(mnGRD=signif(mean(GRD_PNTS_PER_UNIT_NBR),3),seGRD=signif(sd(GRD_PNTS_PER_UNIT_NBR,na.rm=TRUE)/sqrt(n()),3))
+  maxSE <- max(tt$seGRD,na.rm=TRUE)
+  tt <- tt %>% replace_na(list(seGRD=maxSE))
+  tt$seGRD[e  <- tt$seGRD == 0] <- maxSE 
+  return(tt)
+}
+
+gpao.binned.urm <- function(scRES)
+{
+  #scRES %>% group_by(STDNT_GNDR_SHORT_DES) %>% summarsize(meanGRD)
+  tt <- scRES %>% group_by(URM,bin) %>% 
+    summarise(mnGRD=signif(mean(GRD_PNTS_PER_UNIT_NBR),3),seGRD=signif(sd(GRD_PNTS_PER_UNIT_NBR,na.rm=TRUE)/sqrt(n()),3))
+  maxSE <- max(tt$seGRD,na.rm=TRUE)
+  tt <- tt %>% replace_na(list(seGRD=maxSE))
+  tt$seGRD[e  <- tt$seGRD == 0] <- maxSE 
+  return(tt)
+}
+
+gpao.binned.first.gen <- function(scRES)
+{
+  #scRES %>% group_by(STDNT_GNDR_SHORT_DES) %>% summarsize(meanGRD)
+  tt <- scRES %>% group_by(FG,bin) %>% 
+    summarise(mnGRD=signif(mean(GRD_PNTS_PER_UNIT_NBR),3),seGRD=signif(sd(GRD_PNTS_PER_UNIT_NBR,na.rm=TRUE)/sqrt(n()),3))
+  maxSE <- max(tt$seGRD,na.rm=TRUE)
+  tt <- tt %>% replace_na(list(seGRD=maxSE))
+  tt$seGRD[e  <- tt$seGRD == 0] <- maxSE 
+  return(tt)
+
 }
