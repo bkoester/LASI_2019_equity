@@ -1,4 +1,4 @@
-grade_performance <- function(sr,sc,SBJCT='Physics, General',CATNUM=167)
+grade_performance <- function(sr,sc,SBJCT='Physics, General',CATNUM=167,SBJCT2='NONE',CATNUM2='NONE')
 {
   library(tidyverse)
   sr <- read_tsv('~/Google Drive/code/SEISMIC/LASI19code/LASI_2019_equity/student_record.tab')
@@ -9,10 +9,18 @@ grade_performance <- function(sr,sc,SBJCT='Physics, General',CATNUM=167)
   hh <- sc %>% filter(SBJCT_CD == SBJCT & CATLG_NBR == CATNUM) %>% 
         select(STDNT_ID,GRD_PNTS_PER_UNIT_NBR,EXCL_CLASS_CUM_GPA,TERM_CD) %>% left_join(sr)
   
-  equity <- course_equity(hh)
+  equity    <- course_equity(hh)
   diversity <- course_diversity(hh,sr)
   
-  #return(pp)
+  if (SBJCT2 != 'NONE')
+  {
+    hh2 <- sc %>% filter(SBJCT_CD == SBJCT2 & CATLG_NBR == CATNUM2) %>% 
+      select(STDNT_ID,TERM_CD)
+    hh  <- hh %>% left_join(hh2,by='STDNT_ID')
+    
+  }
+  
+  return(hh)
 }
 
 course_diversity <- function(hh,sr,q=2)
