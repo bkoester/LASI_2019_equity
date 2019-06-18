@@ -1,27 +1,25 @@
-grade_performance <- function(SBJCT='PHYSICS',CATNUM=140,SBJCT2='NONE',CATNUM2='NONE',
+grade_performance <- function(sr,sc,SBJCT='PHYSICS',CATNUM=140,SBJCT2='NONE',CATNUM2='NONE',
                               EQUITY=FALSE,DIVERSITY=FALSE,INCL=FALSE,ISREAL=FALSE)
 {
   library(tidyverse)
   
   if (ISREAL==FALSE)
   {
-    sr <- read_tsv('~/Google Drive/code/SEISMIC/LASI19code/LASI_2019_equity/student_record.tab')
-    sc <- read_tsv('~/Google Drive/code/SEISMIC/LASI19code/LASI_2019_equity/student_course.tab')
+    sr <- read_tsv('~/Google Drive/code/SEISMIC/LASI19code/LASI_2019_equity/student_record.tab', col_types = cols())
+    sc <- read_tsv('~/Google Drive/code/SEISMIC/LASI19code/LASI_2019_equity/student_course.tab', col_types = cols())
   }
   
   if (ISREAL==TRUE)
   {
-    sr <- read_tsv("Box Sync/SEISMIC/SEISMIC_Data/student_record.tsv")
-    sc <- read_tsv("Box Sync/SEISMIC/SEISMIC_Data/student_course.tsv")
+    sr <- read_tsv("Box Sync/SEISMIC/SEISMIC_Data/student_record.tsv", col_types = cols())
+    sc <- read_tsv("Box Sync/SEISMIC/SEISMIC_Data/student_course.tsv", col_types = cols())
     sr <- sr %>% mutate(MEDIAN_INCOME=1) %>% filter(FIRST_TERM_ATTND_CD >= 1860)
     sr <- sr %>% drop_na() %>% mutate(STDNT_GNDR_SHORT_DES=case_when(STDNT_GNDR_SHORT_DES == 'Male' ~ 0, 
                                                        STDNT_GNDR_SHORT_DES == 'Female' ~ 1))
     sc <- sc %>% filter(TERM_CD >= 1860)
   }
-  
-  #physics 140
-  #physics 240
-  
+
+  #select the courses  
   hh <- sc %>% filter(SBJCT_CD == SBJCT & CATLG_NBR == CATNUM) %>% 
         select(STDNT_ID,GRD_PNTS_PER_UNIT_NBR,EXCL_CLASS_CUM_GPA,TERM_CD) %>% left_join(sr) %>% drop_na()
   
@@ -68,20 +66,23 @@ course_diversity <- function(hh,sr,q=2)
 #dig into course equity
 course_equity <- function(hh)
 {
-  kk <- lasso_rank(hh,indep=c('MAX_ACT_MATH_SCR','HS_GPA','STDNT_UNDREP_MNRTY_CD',
-                              'FIRST_GENERATION','EXCL_CLASS_CUM_GPA','STDNT_GNDR_SHORT_DES',
-                              'MEDIAN_INCOME'))
   
+  #compute the grade-GPAO
   gpd <- hh %>% mutate(GPEN=GRD_PNTS_PER_UNIT_NBR-EXCL_CLASS_CUM_GPA) %>% 
     group_by(STDNT_GNDR_SHORT_DES) %>%
     summarize(GPD=mean(GPEN,na.rm=TRUE),se=sd(GPEN,na.rm=TRUE)/sqrt(n()))
   print('first order course equity:')
   print(gpd)
   
-  #run propensity score matching
+  #use LASSO to understand what else contributes
+  kk <- lasso_rank(hh,indep=c('MAX_ACT_MATH_SCR','HS_GPA','STDNT_UNDREP_MNRTY_CD',
+                              'FIRST_GENERATION','EXCL_CLASS_CUM_GPA','STDNT_GNDR_SHORT_DES',
+                              'MEDIAN_INCOME'))
+  
+  #run propensity score matching using this knowledge
   psm <- pp_match(as.data.frame(hh))
   
-  #now compute the case and control statistics
+  #annd... compute the case and control statistics
   stats <- psm %>% summarize(mnCASE=mean(CASE_STATS1),seCASE=sd(CASE_STATS1)/sqrt(n()),
                              mnCONT=mean(CONT_STATS1),seCONT=sd(CONT_STATS1)/sqrt(n()),
                              mnGRAND=mean(CASE_STATS1-CONT_STATS1),
@@ -130,5 +131,4 @@ pp_match <- function(hh)
   return(as_tibble(kk))
   
 }
-
 
