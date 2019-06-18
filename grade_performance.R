@@ -108,11 +108,11 @@ sequence_inclusion <- function(hh,sc,SBJCT2,CATNUM2)
   
   print('persistence by GRADE')
   ll <- hh %>% mutate(N=n()) %>% group_by(GRD_PNTS_PER_UNIT_NBR) %>% 
-         summarize(FRACTION=sum(CONTINUE)/n(),ERROR=sqrt(FRACTION*(1-FRACTION)/n()))
+         summarize(FRACTION=sum(CONTINUE)/n(),ERROR=sqrt(FRACTION*(1-FRACTION)/n()),N=n())
   print(ll)
   print('persistence by GENDER')
   ll <- hh %>% mutate(N=n()) %>% group_by(STDNT_GNDR_SHORT_DES) %>% 
-         summarize(FRACTION=sum(CONTINUE)/n(),ERROR=sqrt(FRACTION*(1-FRACTION)/n()))
+         summarize(FRACTION=sum(CONTINUE)/n(),ERROR=sqrt(FRACTION*(1-FRACTION)/n()),N=n())
   print(ll)
   
   return(ll)
