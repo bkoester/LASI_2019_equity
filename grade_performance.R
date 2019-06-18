@@ -50,7 +50,9 @@ course_diversity <- function(hh,sr,q=2)
   print("course demographic table")
   print(CLASS_NBR)
   div        <- sum(CLASS_NBR$P^q)^(1/(1-q))
+  shn        <- -1.0*sum(CLASS_NBR$P*log(CLASS_NBR$P))
   print(paste('course diversity = ',div))
+  print(paste('course shannon entropy = ',shn))
   
   #university-wide
   sr <- sr %>% mutate(DIVMTX=str_c(STDNT_UNDREP_MNRTY_CD,STDNT_GNDR_SHORT_DES,FIRST_GENERATION))
@@ -58,7 +60,9 @@ course_diversity <- function(hh,sr,q=2)
   print("university demographic table")
   print(CLASS_NBR)
   div       <- sum(CLASS_NBR$P^q)^(1/(1-q))
+  shn       <- -1.0*sum(CLASS_NBR$P*log(CLASS_NBR$P))
   print(paste('University diversity = ',div))
+  print(paste('University shannon entropy = ',shn))
   #print(sr %>% mutate(N=n()) %>% group_by(STDNT_UNDREP_MNRTY_CD,STDNT_GNDR_SHORT_DES,FIRST_GENERATION) %>% summarize(n()/N[1]))
   
 }
