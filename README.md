@@ -36,3 +36,24 @@ is also a limitation when it comes to developing shared methods and drawing in m
 that are central to this project. Diversity, equity, and inclusion will be considered in these contexts.
 - `student_record.tab`: A synthetic data set of student background/demography data that serves as basic controls for
 academic preparation gender/URM/first-gen status.
+
+### Cut and paste examples
+#### Example 1
+`> source(simple.grade.penalty.R)`
+
+`> sc <- load_sc_data()`
+
+`> sr <- load_sr_data()`
+
+`> acs <- all_course_statistics(sr,sc)`
+
+`> course_grade_penalty_plots(sr,sc,'PHYSICS',140)`
+
+`> course_grade_penalty_plots_by_gender(sr,sc,'PHYSICS',140)`
+
+`>`
+
+`> source('grade_performance.R')`
+
+`> aa <- grade_performance(EQUITY=TRUE,ISREAL=FALSE,SBJCT='PHYSICS',CATNUM=140) `
+
