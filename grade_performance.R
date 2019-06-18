@@ -115,6 +115,10 @@ sequence_inclusion <- function(hh,sc,SBJCT2,CATNUM2)
          summarize(FRACTION=sum(CONTINUE)/n(),ERROR=sqrt(FRACTION*(1-FRACTION)/n()),N=n())
   print(ll)
   
+  #print('persistence by GENDER x URM')
+  #ll <- hh %>% mutate(N=n()) %>% group_by(STDNT_GNDR_SHORT_DES,STDNT_UNDREP_MNRTY_CD) %>% 
+  #  summarize(FRACTION=sum(CONTINUE)/n(),ERROR=sqrt(FRACTION*(1-FRACTION)/n()),N=n())
+  #print(ll)
   return(ll)
   
 }
