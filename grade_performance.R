@@ -1,12 +1,19 @@
-grade_performance <- function(sr,sc,SBJCT='PHYSICS',CATNUM=140,SBJCT2='NONE',CATNUM2='NONE',
+grade_performance <- function(SBJCT='PHYSICS',CATNUM=140,SBJCT2='NONE',CATNUM2='NONE',
                               EQUITY=FALSE,DIVERSITY=FALSE,INCL=FALSE,ISREAL=FALSE)
 {
   library(tidyverse)
-  #sr <- read_tsv('~/Google Drive/code/SEISMIC/LASI19code/LASI_2019_equity/student_record.tab')
-  #sc <- read_tsv('~/Google Drive/code/SEISMIC/LASI19code/LASI_2019_equity/student_course.tab')
+  
+  if (ISREAL==FALSE)
+  {
+    sr <- read_tsv('~/Google Drive/code/SEISMIC/LASI19code/LASI_2019_equity/student_record.tab')
+    sc <- read_tsv('~/Google Drive/code/SEISMIC/LASI19code/LASI_2019_equity/student_course.tab')
+  }
   
   if (ISREAL==TRUE)
   {
+    sr <- read_tsv("Box Sync/SEISMIC/SEISMIC_Data/student_record.tsv")
+    sc <- read_tsv("Box Sync/SEISMIC/SEISMIC_Data/student_course.tsv")
+    sr <- sr %>% mutate(MEDIAN_INCOME=1) %>% filter(FIRST_TERM_ATTND_CD >= 1860)
     sr <- sr %>% drop_na() %>% mutate(STDNT_GNDR_SHORT_DES=case_when(STDNT_GNDR_SHORT_DES == 'Male' ~ 0, 
                                                        STDNT_GNDR_SHORT_DES == 'Female' ~ 1))
     sc <- sc %>% filter(TERM_CD >= 1860)
@@ -16,7 +23,7 @@ grade_performance <- function(sr,sc,SBJCT='PHYSICS',CATNUM=140,SBJCT2='NONE',CAT
   #physics 240
   
   hh <- sc %>% filter(SBJCT_CD == SBJCT & CATLG_NBR == CATNUM) %>% 
-        select(STDNT_ID,GRD_PNTS_PER_UNIT_NBR,EXCL_CLASS_CUM_GPA,TERM_CD) %>% left_join(sr)
+        select(STDNT_ID,GRD_PNTS_PER_UNIT_NBR,EXCL_CLASS_CUM_GPA,TERM_CD) %>% left_join(sr) %>% drop_na()
   
   if (EQUITY == TRUE)
   {
@@ -31,7 +38,6 @@ grade_performance <- function(sr,sc,SBJCT='PHYSICS',CATNUM=140,SBJCT2='NONE',CAT
   if (INCL==TRUE)
   {
     tt <- sequence_inclusion(hh,sc,SBJCT=SBJCT2,CATNUM=CATNUM2)
-    print(tt)
   }
   
   return()
@@ -99,10 +105,14 @@ sequence_inclusion <- function(hh,sc,SBJCT2,CATNUM2)
 
   hh$CONTINUE[which(is.na(hh$TERM_CD.y))] <- 0
   
+  print('persistence by GRADE')
   ll <- hh %>% mutate(N=n()) %>% group_by(GRD_PNTS_PER_UNIT_NBR) %>% 
-         summarize(nex=sum(CONTINUE)/n(),sqrt(nex*(1-nex)/n()))
+         summarize(FRACTION=sum(CONTINUE)/n(),ERROR=sqrt(FRACTION*(1-FRACTION)/n()))
+  print(ll)
+  print('persistence by GENDER')
   ll <- hh %>% mutate(N=n()) %>% group_by(STDNT_GNDR_SHORT_DES) %>% 
-         summarize(nex=sum(CONTINUE)/n(),sqrt(nex*(1-nex)/n()))
+         summarize(FRACTION=sum(CONTINUE)/n(),ERROR=sqrt(FRACTION*(1-FRACTION)/n()))
+  print(ll)
   
   return(ll)
   

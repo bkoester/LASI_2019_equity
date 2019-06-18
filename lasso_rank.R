@@ -9,7 +9,7 @@ lasso_rank <- function(data,pred='GRD_PNTS_PER_UNIT_NBR',indep=c('MAX_ACT_MATH_S
   formi <- as.formula(paste('~',paste(indep,collapse='+'),sep=""))
   
   x <- model.matrix(formi,x)
-  print(x)
+
   #x <- model.matrix(x)
   
   #colnames(x) <- indep
