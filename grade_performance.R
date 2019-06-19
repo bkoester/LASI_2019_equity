@@ -2,6 +2,12 @@ grade_performance <- function(sr,sc,SBJCT='PHYSICS',CATNUM=140,SBJCT2='NONE',CAT
                               EQUITY=FALSE,DIVERSITY=FALSE,INCL=FALSE,ISREAL=FALSE)
 {
   library(tidyverse)
+  #library(optmatch)
+  #library(lars)
+  #source('~/Google Drive/code/SEISMIC/LASI19code/LASI_2019_equity/simple.grade.penalty.R')
+  #source('~/Google Drive/code/SEISMIC/LASI19code/LASI_2019_equity/larc.matched.outcomes.R')
+  #source('~/Google Drive/code/SEISMIC/LASI19code/LASI_2019_equity/lasso_rank.R')
+  #source('~/Google Drive/code/SEISMIC/LASI19code/LASI_2019_equity/grade_performance.R')
   
   if (ISREAL==FALSE)
   {
@@ -119,10 +125,11 @@ sequence_inclusion <- function(hh,sc,SBJCT2,CATNUM2)
          summarize(FRACTION=sum(CONTINUE)/n(),ERROR=sqrt(FRACTION*(1-FRACTION)/n()),N=n())
   print(ll)
   
-  #print('persistence by GENDER x URM')
-  #ll <- hh %>% mutate(N=n()) %>% group_by(STDNT_GNDR_SHORT_DES,STDNT_UNDREP_MNRTY_CD) %>% 
-  #  summarize(FRACTION=sum(CONTINUE)/n(),ERROR=sqrt(FRACTION*(1-FRACTION)/n()),N=n())
-  #print(ll)
+  print('persistence by GENDER x GRD_PNTS_PER_UNIT_NBR')
+  ll <- hh %>% mutate(N=n()) %>% group_by(STDNT_GNDR_SHORT_DES,GRD_PNTS_PER_UNIT_NBR) %>% 
+    summarize(FRACTION=sum(CONTINUE)/n(),ERROR=sqrt(FRACTION*(1-FRACTION)/n()),N=n())
+  print(ll)
+  
   return(ll)
   
 }
@@ -130,12 +137,12 @@ sequence_inclusion <- function(hh,sc,SBJCT2,CATNUM2)
 pp_match <- function(hh)
 {
   library(optmatch)
-  dir <- '/Users/bkoester/Google Drive/code/REBUILD/LARC.GITHUB/'
-  source(paste(dir,'larc.matched.outcomes.R',sep=''))
+  #dir <- '/Users/bkoester/Google Drive/code/REBUILD/LARC.GITHUB/'
+  #source(paste(dir,'larc.matched.outcomes.R',sep=''))
   kk <- larc.matched.outcomes(hh,'STDNT_GNDR_SHORT_DES',
                               "0","1",
-                              c('MAX_ACT_MATH_SCR','EXCL_CLASS_CUM_GPA','HS_GPA'),
-                               type=c('N','N','N'),OUTCOME='GRD_PNTS_PER_UNIT_NBR')
+                              c('MAX_ACT_MATH_SCR','EXCL_CLASS_CUM_GPA'),
+                               type=c('N','N'),OUTCOME='GRD_PNTS_PER_UNIT_NBR')
   return(as_tibble(kk))
   
 }

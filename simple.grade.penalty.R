@@ -1,9 +1,11 @@
 library(tidyverse)
 
+#Don't forget to set your working directory to the place where you have the data files!
+
 load_sc_data <- function() {
   
 
-  scname <- "C:/Users/tamckay/Documents/R Code/LASI_2019_equity-master/student_course.tab"
+  scname <- "student_course.tab"
   sc <- read_tsv(scname)
   
   return(sc)
@@ -11,7 +13,7 @@ load_sc_data <- function() {
 
 load_sr_data <- function() {
   
-  srname <- "C:/Users/tamckay/Documents/R Code/LASI_2019_equity-master/student_record.tab"
+  srname <- "student_record.tab"
   sr <- read_tsv(srname)
   
   return(sr)
@@ -81,12 +83,12 @@ course_grade_penalty_plot <- function(sr,sc,subject,catalognbr) {
     return("There are no students in this course")
   }
   
-  tpout <- tprofile(pin$EXCL_CLASS_CUM_GPA,pin$GRD_PNTS_PER_UNIT_NBR,nxbins=40,xrange=c(1.0,4.))
+  tpout <- tprofile(pin$EXCL_CLASS_CUM_GPA,pin$GRD_PNTS_PER_UNIT_NBR,nxbins=20,xrange=c(1.0,4.))
   tpplot(tpout,xlab='GPAO',ylab='Grade',
          main=paste(subject," ",catalognbr),xlim=c(0,4),ylim=c(0,4))
   #Calculate the average grade penalty
   grade_penalty <- mean(pin$GRD_PNTS_PER_UNIT_NBR - pin$EXCL_CLASS_CUM_GPA,na.rm=T)
-  legend(1.0,3.8,paste('Grade penalty =',format(grade_penalty,digits=2)))
+  legend(0.0,3.8,paste('Grade penalty =',format(grade_penalty,digits=2)))
 }
 
 
@@ -138,11 +140,11 @@ course_grade_penalty_plot_by_gender <- function(sr,sc,subject,catalognbr,random=
   grade_penalty_female <- mean(pin_female$GRD_PNTS_PER_UNIT_NBR - pin_female$EXCL_CLASS_CUM_GPA,na.rm=T)
   
   if(random == 0) {
-    legend(1,4,c(paste("Male GP = ",format(grade_penalty_male,digits=2)),
+    legend(0,4,c(paste("Male GP = ",format(grade_penalty_male,digits=2)),
                  paste("Female GP = ",format(grade_penalty_female,digits=2))),pch=c(0,5))
   }
   if(random != 0) {
-    legend(1,4,c(paste("Random 1: ",format(grade_penalty_male,digits=2)),
+    legend(0,4,c(paste("Random 1: ",format(grade_penalty_male,digits=2)),
                  paste("Random 2: ",format(grade_penalty_female,digits=2))),pch=c(0,5))
   }
   
@@ -195,6 +197,7 @@ tprofile <- function(ar1,ar2,nxbins=10,xrange=c(0.,0.)) {
   }
   
   keep <- which((tpout$ymean != 0.) & (tpout$ymeanerr != 0.))
+  #keep <- which((tpout$ymean != 0.))
   tpout <- tpout[keep,]
   
   return(tpout)
@@ -224,6 +227,7 @@ tpplot <- function(tpout,ylab="",xlab="",main="",xlim=c(0.,0.),ylim=c(0.,0.),opl
     lines(tpout$xmean,tpout$ymean-tpout$yerr,lty=3,col=col)
   }
   lines(c(-1.,5.),c(-1.,5.),lty=1)
+  
   arrows(tpout$xmean, tpout$ymean-tpout$ymeanerr, 
          tpout$xmean, tpout$ymean+tpout$ymeanerr, length=0.05, 
          angle=90, code=3)	
