@@ -1,9 +1,13 @@
 grade_performance <- function(sr,sc,SBJCT='PHYSICS',CATNUM=140,SBJCT2='NONE',CATNUM2='NONE',
                               EQUITY=FALSE,DIVERSITY=FALSE,INCL=FALSE,ISREAL=FALSE)
 {
-  library(tidyverse)
+
+  #install.packages(c('tidyverse','optmatch','lars'))
+  
+  #library(tidyverse)
   #library(optmatch)
   #library(lars)
+  
   #source('~/Google Drive/code/SEISMIC/LASI19code/LASI_2019_equity/simple.grade.penalty.R')
   #source('~/Google Drive/code/SEISMIC/LASI19code/LASI_2019_equity/larc.matched.outcomes.R')
   #source('~/Google Drive/code/SEISMIC/LASI19code/LASI_2019_equity/lasso_rank.R')
