@@ -47,7 +47,7 @@ academic preparation gender/URM/first-gen status.
 
 `> acs <- all_course_statistics(sr,sc)`
 
-`> course_grade_penalty_plots(sr,sc,'PHYSICS',140)`
+`> course_grade_penalty_plot(sr,sc,'PHYSICS',140)`
 
 `> course_grade_penalty_plots_by_gender(sr,sc,'PHYSICS',140)`
 
